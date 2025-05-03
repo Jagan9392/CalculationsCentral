@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculations Central</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .hidden {
+      display: none;
+    }
+    .btn {
+      padding: 0.75rem;
+      font-weight: bold;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+    }
+    .calc-keypad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+    .calc-keypad button {
+      padding: 1rem;
+      font-size: 1.25rem;
+      font-weight: bold;
+      border-radius: 0.5rem;
+      background: linear-gradient(to right, #38b2ac, #3182ce);
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: all 0.2s ease-in-out;
+    }
+    .calc-keypad button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(to right, #319795, #2b6cb0);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-r from-blue-50 to-purple-100 flex justify-center items-center min-h-screen">
+  <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-4xl transition-all">
+    <h1 class="text-3xl font-bold text-center text-blue-700 mb-8 tracking-wide animate-pulse">Calculations Central</h1>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <button onclick="showCalculator('standard')" class="tab-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform transform hover:scale-105">Standard</button>
+      <button onclick="showCalculator('age')" class="tab-btn bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform transform hover:scale-105">Age</button>
+      <button onclick="showCalculator('compound')" class="tab-btn bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform transform hover:scale-105">Compound</button>
+      <button onclick="showCalculator('loan')" class="tab-btn bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg transition-transform transform hover:scale-105">Loan EMI</button>
+      <button onclick="showCalculator('discount')" class="tab-btn bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-lg shadow-lg transition-transform transform hover:scale-105">Discount</button>
+      <button onclick="showCalculator('temperature')" class="tab-btn bg-cyan-400 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg shadow-lg transition-transform transform hover:scale-105">Temperature</button>
+         </div>
+
+    <!-- Standard Calculator -->
+    <div id="standard" class="calc-section hidden">
+      <input id="expression" type="text" placeholder="0" class="w-full mb-3 p-3 border rounded-lg text-right text-xl font-mono shadow-inner" readonly />
+      <div class="calc-keypad">
+        <button onclick="appendValue('7')">7</button>
+        <button onclick="appendValue('8')">8</button>
+        <button onclick="appendValue('9')">9</button>
+        <button onclick="appendValue('/')">÷</button>
+        <button onclick="appendValue('4')">4</button>
+        <button onclick="appendValue('5')">5</button>
+        <button onclick="appendValue('6')">6</button>
+        <button onclick="appendValue('*')">×</button>
+        <button onclick="appendValue('1')">1</button>
+        <button onclick="appendValue('2')">2</button>
+        <button onclick="appendValue('3')">3</button>
+        <button onclick="appendValue('-')">−</button>
+        <button onclick="appendValue('0')">0</button>
+        <button onclick="appendValue('.')">.</button>
+        <button onclick="clearExpression()">C</button>
+        <button onclick="appendValue('+')">+</button>
+        <button onclick="calculateExpression()" class="col-span-4 bg-green-600 hover:bg-green-700">=</button>
+      </div>
+    </div>
+
+ 
+    <!-- Age Calculator -->
+    <div id="age" class="calc-section hidden">
+      <input id="birthYear" type="date" class="w-full mb-3 p-3 border rounded-lg shadow-inner" />
+      <button onclick="calculateAge()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg w-full shadow-lg">Calculate Age</button>
+    </div>
+
+    <!-- Compound Interest Calculator -->
+    <div id="compound" class="calc-section hidden">
+      <input id="principal" type="number" placeholder="Principal Amount" class="w-full mb-3 p-3 border rounded-lg shadow-inner" />
+      <input id="rate" type="number" placeholder="Annual Interest Rate (%)" class="w-full mb-3 p-3 border rounded-lg shadow-inner" />
+      <input id="time" type="number" placeholder="Time (years)" class="w-full mb-3 p-3 border rounded-lg shadow-inner" />
+      <input id="n" type="number" placeholder="Compounded per year (e.g. 4 for quarterly)" class="w-full mb-4 p-3 border rounded-lg shadow-inner" />
+      <button onclick="calculateCompoundInterest()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg w-full shadow-lg">Calculate Compound Interest</button>
+    </div>
+
+    <!-- Loan EMI Calculator -->
+    <div id="loan" class="calc-section hidden">
+      <input id="loanAmount" type="number" placeholder="Loan Amount" class="w-full mb-3 p-3 border rounded-lg shadow-inner" />
+      <input id="loanRate" type="number" placeholder="Annual Interest Rate (%)" class="w-full mb-3 p-3 border rounded-lg shadow-inner" />
+      <input id="loanTenure" type="number" placeholder="Tenure (in months)" class="w-full mb-4 p-3 border rounded-lg shadow-inner" />
+      <button onclick="calculateLoanEMI()" class="bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-lg w-full shadow-lg">Calculate EMI</button>
+    </div>
+
+    <!-- Temperature Converter -->
+    <div id="temperature" class="calc-section hidden">
+      <input id="tempInput" type="number" placeholder="Enter Temperature" class="w-full mb-3 p-3 border rounded-lg shadow-inner" />
+      <select id="tempUnit" class="w-full mb-4 p-3 border rounded-lg shadow-inner">
+        <option value="C">Celsius to Fahrenheit</option>
+        <option value="F">Fahrenheit to Celsius</option>
+      </select>
+      <button onclick="convertTemperature()" class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full shadow-lg">Convert Temperature</button>
+    </div>
+
+    <!-- Discount Calculator -->
+    <div id="discount" class="calc-section hidden">
+      <select id="discountOption" onchange="toggleDiscountInputs()" class="w-full mb-3 p-3 border rounded-lg shadow-inner">
+        <option value="findAmount">Find Final Price from Percentage</option>
+        <option value="findPercent">Find Discount % from Amount</option>
+      </select>
+      <div id="findAmountFields">
+        <input id="originalPrice" type="number" placeholder="Original Price" class="w-full mb-3 p-3 border rounded-lg shadow-inner" />
+        <input id="discountPercent" type="number" placeholder="Discount %" class="w-full mb-4 p-3 border rounded-lg shadow-inner" />
+        <button onclick="calculateDiscountAmount()" class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg w-full shadow-lg">Calculate Final Price</button>
+      </div>
+      <div id="findPercentFields" class="hidden">
+        <input id="originalPrice2" type="number" placeholder="Original Price" class="w-full mb-3 p-3 border rounded-lg shadow-inner" />
+        <input id="finalPrice" type="number" placeholder="Final Buying Price" class="w-full mb-4 p-3 border rounded-lg shadow-inner" />
+        <button onclick="calculateDiscountPercent()" class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg w-full shadow-lg">Calculate Discount %</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showCalculator(id) {
+      document.querySelectorAll('.calc-section').forEach(div => div.classList.add('hidden'));
+      const section = document.getElementById(id);
+      if (section) section.classList.remove('hidden');
+    }
+
+    function calculateExpression() {
+      const expression = document.getElementById('expression').value;
+      try {
+        const result = eval(expression);
+        Swal.fire("Result", `The answer is ${result}`, "success");
+      } catch {
+        Swal.fire("Oops!", "Invalid expression. Try again!", "error");
+      }
+    }
+
+    function calculateAge() {
+      const birthDate = new Date(document.getElementById('birthYear').value);
+      if (isNaN(birthDate)) return;
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      Swal.fire("Your Age", `Ohooo! You are ${age} years young! 🎉`, "info");
+    }
+
+    function calculateCompoundInterest() {
+      const p = parseFloat(document.getElementById('principal').value);
+      const r = parseFloat(document.getElementById('rate').value);
+      const t = parseFloat(document.getElementById('time').value);
+      const n = parseFloat(document.getElementById('n').value);
+      if ([p, r, t, n].some(isNaN)) return;
+      const amount = p * Math.pow(1 + (r / (100 * n)), n * t);
+      const ci = amount - p;
+      Swal.fire("Compound Interest", `Your investment grew by ₹${ci.toFixed(2)}. Total: ₹${amount.toFixed(2)} 🎉`, "success");
+    }
+
+    function calculateLoanEMI() {
+      const P = parseFloat(document.getElementById('loanAmount').value);
+      const R = parseFloat(document.getElementById('loanRate').value) / 12 / 100;
+      const N = parseInt(document.getElementById('loanTenure').value);
+      if ([P, R, N].some(isNaN)) return;
+      const EMI = (P * R * Math.pow(1 + R, N)) / (Math.pow(1 + R, N) - 1);
+      Swal.fire("Loan EMI", `Your EMI is ₹${EMI.toFixed(2)} per month 💰`, "info");
+    }
+
+    function convertTemperature() {
+      const value = parseFloat(document.getElementById('tempInput').value);
+      const unit = document.getElementById('tempUnit').value;
+      if (isNaN(value)) return;
+      let result;
+      if (unit === 'C') {
+        result = (value * 9/5) + 32;
+        Swal.fire("Converted", `${value}°C is ${result.toFixed(2)}°F 🌡️`, "success");
+      } else {
+        result = (value - 32) * 5/9;
+        Swal.fire("Converted", `${value}°F is ${result.toFixed(2)}°C ❄️`, "success");
+      }
+    }
+
+    function toggleDiscountInputs() {
+      const option = document.getElementById('discountOption').value;
+      document.getElementById('findAmountFields').classList.toggle('hidden', option !== 'findAmount');
+      document.getElementById('findPercentFields').classList.toggle('hidden', option !== 'findPercent');
+    }
+
+    function calculateDiscountAmount() {
+      const price = parseFloat(document.getElementById('originalPrice').value);
+      const discount = parseFloat(document.getElementById('discountPercent').value);
+      if (isNaN(price) || isNaN(discount)) return;
+      const finalPrice = price - (price * (discount / 100));
+      Swal.fire("Final Price", `You pay ₹${finalPrice.toFixed(2)} after ${discount}% discount! 🎉`, "success");
+    }
+
+    function calculateDiscountPercent() {
+      const original = parseFloat(document.getElementById('originalPrice2').value);
+      const final = parseFloat(document.getElementById('finalPrice').value);
+      if (isNaN(original) || isNaN(final) || final > original) return;
+      const discount = ((original - final) / original) * 100;
+      Swal.fire("Discount Percent", `You got a discount of ${discount.toFixed(2)}%! 🎊`, "info");
+    }
+  </script>
+</body>
+</html>
